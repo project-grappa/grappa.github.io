@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="GRAPPA: Generalizing and Adapting Robot Policies via Online Agentic Guidance">
+  <meta name="keywords" content="GRAPPA, robotics, policy generalization, agentic guidance, robot learning">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GRAPPA: Generalizing and Adapting Robot Policies via Online Agentic Guidance</title>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script> -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', 'G-PYVRSFMDRL');
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.svg">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+</head>
+
+<body>
+
+  <nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </a>
+    </div>
+    <div class="navbar-menu">
+      <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
+        <!-- TODO complete personal link-->
+        <a class="navbar-item" href="">
+          <span class="icon">
+            <i class="fas fa-home"></i>
+          </span>
+        </a>
+
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link">
+            More Research
+          </a>
+          <div class="navbar-dropdown">
+            <!-- TODO complete open perception link-->
+            <a class="navbar-item" href="">
+              Open Perception (Coming soon)
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </nav>
+
+
+  <section class="hero ">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-1 publication-title">GRAPPA: Generalizing and Adapting Robot Policies
+              via Online Agentic Guidance</h1>
+            <div class="is-size-5 publication-authors">
+              Author Names Omitted for Anonymous Review.
+            
+            </div>
+            <div class="has-text-centered" style="margin-top: 40px;">
+              <div class="publication-links">
+                <!-- PDF Link. -->
+                <span class="link-block">
+                  <a href="./static/documents/GRAPPA_RAL.pdf" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                    </span>
+                    <span>Paper</span>
+                  </a>
+                </span>
+                <span class="link-block disabled" alt="arxiv Omitted for Anonymous Review">
+                  <a href="https://arxiv.org/abs/2410.06473" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                    </span>
+                    <span>arXiv</span>
+                  </a>
+                </span>
+
+                <!-- Video Link. -->
+                <!-- <span class="link-block disabled">
+                    <a href=""
+                        class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                        <i class="fab fa-youtube"></i>
+                    </span>
+                    <span>Video (coming soon)</span>
+                    </a>
+                </span> -->
+
+                <!-- TODO add grappa link -->
+                <span class="link-block disabled">
+                  <a href="" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fab fa-github"></i>
+                    </span>
+                    <span>GRAPPA (coming soon)</span>
+                  </a>
+                </span>
+
+                <!-- TODO open perception link -->
+                <span class="link-block disabled">
+                  <a href="" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fab fa-github"></i>
+                    </span>
+                    <span>Open-Perception (coming soon)</span>
+                  </a>
+                </span>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- TODO uncommnet authors list  -->
+
+
+        </div>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <section class="hero teaser">
+    <div class="container is-max-desktop">
+      <div class="hero-body">
+        <img id="teaser" src="static/images/image1.png" alt="GRAPPA overview" style="max-width:100%; height:auto;">
+        <h2 class="subtitle has-text-centered">
+          <span class="grappa">GRAPPA</span> Steers Robot Policies by modifying the action distribution with grounded
+          visuomotor cues.
+        </h2>
+      </div>
+    </div>
+  </section>
+
+
+
+
+  <section class="section">
+    <div class="container is-max-desktop">
+      <!-- Abstract. -->
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Abstract</h2>
+          <div class="content has-text-justified">
+            <p>
+              Robot learning approaches such as behavior cloning and reinforcement learning have shown great promise in
+              synthesizing robot skills from human demonstrations in specific environments. However, these approaches
+              often require task-specific demonstrations or designing complex simulation environments, which limits the
+              development of generalizable and robust policies for unseen real-world settings. Recent advances in the
+              use of foundation models for robotics (e.g., LLMs, VLMs) have shown great potential in enabling systems to
+              understand the semantics in the world from large-scale internet data. However, it remains an open
+              challenge to use this knowledge to enable robotic systems to understand the underlying dynamics of the
+              world, to generalize policies across different tasks, and to adapt policies to new environments. To
+              alleviate these limitations, we propose an agentic framework for robot self-guidance and self-improvement,
+              which consists of a set of role-specialized conversational agents, such as a high-level advisor, a
+              grounding agent, a monitoring agent, and a robotic agent. Our framework iteratively grounds a base robot
+              policy to relevant objects in the environment and uses visuomotor cues to shift the action distribution of
+              the policy to more desirable states, online, while remaining agnostic to the subjective configuration of a
+              given robot hardware platform. We demonstrate that our approach can effectively guide manipulation
+              policies to achieve significantly higher success rates, both in simulation and in real-world experiments,
+              without the need for additional human demonstrations or extensive exploration.
+            </p>
+          </div>
+        </div>
+      </div>
+      <!--/ Abstract. -->
+    </div>
+  </section>
+
+  <section class="section is-light">
+    <div class="container is-max-desktop">
+      <!-- Paper video. -->
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <div class="publication-video">
+            <iframe src="./static/videos/GRAPPA_video_small.mp4" frameborder="0" allow="autoplay; encrypted-media"
+              allowfullscreen></iframe>
+          </div>
+        </div>
+      </div>
+      <!--/ Paper video. -->
+    </div>
+  </section>
+
+
+  <section class="hero info_flow">
+    <div class="container is-max-desktop">
+      <div class="hero-body">
+        <img id="info_flow" src="static/images/image2.png" alt="GRAPPA information flow"
+          style="max-width:100%; height:auto;">
+        <p class="has-text-centered has-text-justified">
+          Information flow between the agents to produce a guidance code. a) The advisor agent orchestrates guidance
+          code generation by collaborating with other agents and using their feedback to refine the generated code. b)
+          The grounding agent uses segmentation and classification models to locate objects of interest provided by the
+          advisor, reporting findings back to the advisor. c) The robotic agent uses a Python interpreter to test the
+          code for the specific robotic platform and judge the adequacy of the code. d) The monitor agent analyses the
+          sequence of frames corresponding to the rollout of the guidance and give feedback on potential improvements.
+        </p>
+      </div>
+    </div>
+  </section>
+
+
+
+  <section class="hero is-light is-small">
+    <div class="hero-body">
+      <div class="container">
+        <h3 class="title is-3 has-text-centered">Generalization on Out-Off-Distribution Appearances</h3>
+
+        <div id="results-carousel" class="carousel results-carousel">
+          <div class="item item-steve">
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+              <div style="position: relative; width: 100%;">
+                <video poster="./static/videos/rollouts/base_policy/0.png" id="base_policy_0" autoplay controls muted
+                  loop playsinline height="100%" style="width: 100%;">
+                  <source src="./static/videos/rollouts/base_policy/0.mp4" type="video/mp4">
+                </video>
+                <div class="video_text_overlay">
+                  Base Policy
+                </div>
+                <div class="video_img_overlay">
+                  <img class="checkmark-img" src="./static/images/icons/red.png">
+                </div>
+              </div>
+              <div style="position: relative; width: 100%;">
+                <video poster="./static/videos/rollouts/guided/0.png" id="guided_0" autoplay controls muted loop
+                  playsinline height="100%" style="width: 100%;">
+                  <source src="./static/videos/rollouts/guided/0.mp4" type="video/mp4">
+                </video>
+                <div class="video_text_overlay">
+                  Guided Policy
+                </div>
+                <div class="video_img_overlay">
+                  <img class="checkmark-img" src="./static/images/icons/green.png">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="item item-steve">
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+              <div style="position: relative; width: 100%;">
+                <video poster="./static/videos/rollouts/base_policy/1.png" id="base_policy_1" autoplay controls muted
+                  loop playsinline height="100%" style="width: 100%;">
+                  <source src="./static/videos/rollouts/base_policy/1.mp4" type="video/mp4">
+                </video>
+                <div class="video_text_overlay">
+                  Base Policy
+                </div>
+                <div class="video_img_overlay">
+                  <img class="checkmark-img" src="./static/images/icons/red.png">
+                </div>
+              </div>
+              <div style="position: relative; width: 100%;">
+                <video poster="./static/videos/rollouts/guided/1.png" id="guided_1" autoplay controls muted loop
+                  playsinline height="100%" style="width: 100%;">
+                  <source src="./static/videos/rollouts/guided/1.mp4" type="video/mp4">
+                </video>
+                <div class="video_text_overlay">
+                  Guided Policy
+                </div>
+                <div class="video_img_overlay">
+                  <img class="checkmark-img" src="./static/images/icons/green.png">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="item item-steve">
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+              <div style="position: relative; width: 100%;">
+                <video poster="./static/videos/rollouts/base_policy/2.png" id="base_policy_2" autoplay controls muted
+                  loop playsinline height="100%" style="width: 100%;">
+                  <source src="./static/videos/rollouts/base_policy/2.mp4" type="video/mp4">
+                </video>
+                <div class="video_text_overlay">
+                  Base Policy
+                </div>
+                <div class="video_img_overlay">
+                  <img class="checkmark-img" src="./static/images/icons/red.png">
+                </div>
+              </div>
+              <div style="position: relative; width: 100%;">
+                <video poster="./static/videos/rollouts/guided/2.png" id="guided_2" autoplay controls muted loop
+                  playsinline height="100%" style="width: 100%;">
+                  <source src="./static/videos/rollouts/guided/2.mp4" type="video/mp4">
+                </video>
+                <div class="video_text_overlay">
+                  Guided Policy
+                </div>
+                <div class="video_img_overlay">
+                  <img class="checkmark-img" src="./static/images/icons/red.png">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="item item-steve">
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+              <div style="position: relative; width: 100%;">
+                <video poster="./static/videos/rollouts/base_policy/3.png" id="base_policy_3" autoplay controls muted
+                  loop playsinline height="100%" style="width: 100%;">
+                  <source src="./static/videos/rollouts/base_policy/3.mp4" type="video/mp4">
+                </video>
+                <div class="video_text_overlay">
+                  Base Policy
+                </div>
+                <div class="video_img_overlay">
+                  <img class="checkmark-img" src="./static/images/icons/red.png">
+                </div>
+              </div>
+              <div style="position: relative; width: 100%;">
+                <video poster="./static/videos/rollouts/guided/3.png" id="guided_3" autoplay controls muted loop
+                  playsinline height="100%" style="width: 100%;">
+                  <source src="./static/videos/rollouts/guided/3.mp4" type="video/mp4">
+                </video>
+                <div class="video_text_overlay">
+                  Guided Policy
+                </div>
+                <div class="video_img_overlay">
+                  <img class="checkmark-img" src="./static/images/icons/green.png">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="item item-steve">
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+              <div style="position: relative; width: 100%;">
+                <video poster="./static/videos/rollouts/base_policy/4.png" id="base_policy_4" autoplay controls muted
+                  loop playsinline height="100%" style="width: 100%;">
+                  <source src="./static/videos/rollouts/base_policy/4.mp4" type="video/mp4">
+                </video>
+                <div class="video_text_overlay">
+                  Base Policy
+                </div>
+                <div class="video_img_overlay">
+                  <img class="checkmark-img" src="./static/images/icons/red.png">
+                </div>
+              </div>
+              <div style="position: relative; width: 100%;">
+                <video poster="./static/videos/rollouts/guided/4.png" id="guided_4" autoplay controls muted loop
+                  playsinline height="100%" style="width: 100%;">
+                  <source src="./static/videos/rollouts/guided/4.mp4" type="video/mp4">
+                </video>
+                <div class="video_text_overlay">
+                  Guided Policy
+                </div>
+                <div class="video_img_overlay">
+                  <img class="checkmark-img" src="./static/images/icons/green.png">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="item item-steve">
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+              <div style="position: relative; width: 100%;">
+                <video poster="./static/videos/rollouts/base_policy/5.png" id="base_policy_5" autoplay controls muted
+                  loop playsinline height="100%" style="width: 100%;">
+                  <source src="./static/videos/rollouts/base_policy/5.mp4" type="video/mp4">
+                </video>
+                <div class="video_text_overlay">
+                  Base Policy
+                </div>
+                <div class="video_img_overlay">
+                  <img class="checkmark-img" src="./static/images/icons/red.png">
+                </div>
+              </div>
+              <div style="position: relative; width: 100%;">
+                <video poster="./static/videos/rollouts/guided/5.png" id="guided_5" autoplay controls muted loop
+                  playsinline height="100%" style="width: 100%;">
+                  <source src="./static/videos/rollouts/guided/5.mp4" type="video/mp4">
+                </video>
+                <div class="video_text_overlay">
+                  Guided Policy
+                </div>
+                <div class="video_img_overlay">
+                  <img class="checkmark-img" src="./static/images/icons/green.png">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <section class="section">
+    <div class="container is-max-desktop">
+      <hr>
+
+      <div class="columns is-centered">
+
+        <!-- OOD generalization. -->
+        <div class="column">
+          <div class="content">
+            <h3 class="title is-3 has-text-centered">Out-off-distribution Generalization</h3>
+            <div class="column content has-text-centered">
+
+              <img id="ood" src="static/images/image3.png" alt="position and appearance generalization"
+                style="max-width:100%; height:auto;">
+              <p class="has-text-justified">
+                <span class="grappa">GRAPPA</span> guides the base policy for out-of-distribution cases. The task
+                involves
+                grasping a deformable toy ball and placing it inside a box.
+
+              </p>
+              <img id="ood_table" src="static/images/image4.png" style="max-width:100%; height:auto;">
+            </div>
+          </div>
+        </div>
+        <!--/ OOD generalization. -->
+
+        <!-- Matting. -->
+        <div class="column">
+          <h3 class="title is-3 has-text-centered">Guidance influence</h3>
+          <div class="columns is-centered has-text-centered">
+            <div class="column content">
+              <img id="guidance_influence" src="static/images/image5.png" style="max-width:65%; height:auto;">
+              <p class="has-text-justified">
+                Illustration of the effect of different guidance percentages on a failure case of the base policy. In
+                red we show the base policy failing in an out-of-distribution scenario; with 100\% of guidance (yellow),
+                the end position is successfully above the box, but it has <i>lost low-level notions</i>. By balancing
+                both with intermediate guidance (50%) shown in green, we can complete the task.
+              </p>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <!--/ Matting. -->
+
+
+    </div>
+  </section>
+
+
+
+  <!-- <section class="hero is-light is-small">
+    <div class="hero-body">
+      <div class="container">
+        <div id="results-carousel" class="carousel results-carousel">
+          <div class="item item-buttons">
+            <video poster="" id="buttons" autoplay controls muted loop playsinline height="100%">
+              <source src="https://www.youtube.com/embed/6uGDJi_ELPc" type="video/mp4">
+            </video>
+          </div>
+          <div class="item item-chess">
+            <video poster="" id="chess" autoplay controls muted loop playsinline height="100%">
+              <source src="https://www.youtube.com/embed/TW6MKvfFojg" type="video/mp4">
+            </video>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section> -->
+
+
+
+
+  <section class="section hero is-light">
+    <div class="container is-max-desktop">
+
+      <div class="columns is-centered">
+
+        <!-- No guidance. -->
+        <div class="column">
+          <div class="content">
+            <div style="width:100%; aspect-ratio:1/0.91; overflow:hidden;">
+              <img id="ood" src="static/images/detections_0.gif" alt=""
+                style="width:100%; height:100%; object-fit:cover; object-position:top;">
+            </div>
+            <h4 class="title is-4 has-text-centered" style="color: red;">Pretrained Act3d failing<br>(No guidance)</h4>
+            <p class="has-text-justified">
+              Act3d with no guidance: the policy fails to press the last button (blue), but manages to correctly
+              approach the first 2 buttons reaching them from above with the gripper closed. </p>
+
+          </div>
+        </div>
+        <!--/ No guidance. -->
+
+        <!-- guidance only. -->
+        <div class="column">
+          <div class="columns is-centered">
+            <div class="column content">
+              <img id="guidance_influence" src="static/images/detections_1.gif" style="max-width:100%; height:auto;">
+              <h4 class="title has-text-centered is-4" style="color: orange; font-weight: bold;">
+                + 100% of GRAPPA <br>guidance
+              </h4>
+              <p class="has-text-justified">
+                Guidance only (overwriting the base policy): The sequence of movements is correct, but the initial
+                guidance code doesn’t account that the buttons should be approached from above.
+              </p>
+
+            </div>
+
+          </div>
+        </div>
+        <!--/ guidance only. -->
+
+        <!-- grappa. -->
+        <div class="column">
+          <!-- <h3 class="title is-3">Guidance influence</h3> -->
+          <div class="columns is-centered">
+            <div class="column content">
+              <img id="guidance_influence" src="static/images/detections_0.01.gif" style="max-width:100%; height:auto;">
+              <h4 class="title has-text-centered is-4" style="color: green; font-weight: bold;">
+                Act3d + 1% of GRAPPA <br>guidance
+              </h4>
+              <p class="has-text-justified">
+                Act3d with 1% guidance: The modified policy captures both the low-level motion of the pre-trained policy
+                and the high-level guidance provided, successfully pressing the sequence of buttons. </p>
+
+            </div>
+
+          </div>
+        </div>
+        <!--/ grappa. -->
+      </div>
+    </div>
+  </section>
+
+
+  <section class="hero">
+    <div class="container is-max-desktop">
+      <div class="hero-body">
+        <h2 class="subtitle has-text-centered">
+          Performance improvement on the RL-Bench benchmark, by applying 5 iterations of guidance improvement over
+          unsuccessful rollouts.
+        </h2>
+        <img src="static/images/table.png" alt="RL-BENCH simulation results" style="max-width:100%; height:auto;">
+      </div>
+    </div>
+  </section>
+
+
+
+  <section class="section">
+    <div class="container is-max-desktop">
+
+      <div class="columns is-centered has-text-centered">
+
+        <div class="column">
+          <div class="columns is-centered" style="max-width:100%; height:auto;">
+            <div class="column content has-text-justified">
+              <p>
+                When guiding a completely random policy, GRAPPA is still able to achieve great success rates on tasks
+                that don’t require fine-grained motions. Improving its performance at each iteration.
+              </p>
+              <img id="guidance_influence" src="static/images/scratch.png" style="max-width:100%; height:auto;">
+
+            </div>
+          </div>
+        </div>
+        <div class="column">
+          <div class="columns is-centered has-text-centered">
+            <div class="column content" style="max-width:100%; height:auto;">
+              <img id="guidance_influence" src="static/images/heatmap.png" style="max-width:60%; height:auto;">
+              <p>
+                Heatmap visualization of the guidance distribution, generated online by our proposed agentic framework.
+                The distribution expresses the relevance of each possible future state for completing the task (e.g.
+                "press the blue button"). The guidance is then used to bias the robot policy's action distribution
+                towards the desirable behavior.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="Appendix">
+    <div class="container is-max-desktop content has-text-centered">
+      <hr>
+
+      <h2 class="title">Appendix</h2>
+      <div class="columns is-centered ">
+
+        <div class="column">
+          <div class="columns is-centered has-text-centered" style="max-width:100%; height:auto;">
+            <div class="column content has-text-justified">
+
+              <img id="guidance_influence" src="static/images/failure_analysis.png"
+                style="max-width:100%; height:auto;">
+              <p>
+                Breakdown for failure cases from the learning-from-scratch experiment (push buttons and turn tap),
+                classifying trials
+                by logs, guidance codes, and observed behavior. Note that this analysis is performed on the
+                learning-from-scratch experiment
+                to decouple the errors of GRAPPA from the base policy.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="column">
+          <div class="columns is-centered">
+            <div class="column content" style="max-width:100%; height:auto;">
+              <p>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr>
+      <div class=" is-centered is-max-desktop content">
+        <div class="column">
+          <h4 class="title">Open Perception: A tool kit for visual grounding.</h4>
+
+          <p>
+            We modularize the grounding agent used in GRAPPA and release it as Open Perception, a standalone software
+            package
+            to aid researchers in challenging open-vocabulary object detection and state estimation for embodied robots.
+            Our perception
+            agent uses GroudingDINO and Segment Anything (SAM2) to locate and track objects in the scene, giving a text
+            prompt; we then feed the bounding boxes and masks to two reasoning agents to further refine the selection.
+          </p>
+          <p>
+            A <i>multigranular search</i> agent checks if the desired object was found; if not, it proposes related
+            semantic classes and
+            recursively searches in them, cropping the parent objects to narrow the search. A verification agent can
+            disambiguate between
+            the final detections to choose the most relevant one to the initial query; to do this, we overlay the
+            detection bounding boxes
+            on the images and assign numeric labels and different colors, we then prompt the VLM to choose the most
+            appropriate one
+            given the search objective. Though in the full implementation of GRAPPA, these agents are used in tandem,
+            called by the
+            orchestrator agent, we release them as modular components.
+          </p>
+          <p>
+            Once a detection is made, we use SAM2 to segment and track these objects across the frames. If a
+            corresponding
+            point cloud
+            is available, we provide tools to estimate the 3D-oriented bounding box using PCA. This allows the agent to
+            continuously
+            search, locate, and track an object and provide 3D position reports.
+          </p>
+          <p>
+            At an implementation level, we design Open Perception to support multiple backends, accommodating different
+            software
+            stacks. We provide integrations with REDIS and ROS2; for instantiating the multimodal agents, we utilize
+            LiteLLM, allowing
+            users to choose different models and APIs. We also provide Docker containers for development and deployment.
+          </p>
+          <p>
+            We benchmark our agent on the open-vocabulary detection dataset OCID-Ref*. OCID-Ref extends the Object
+            Clutter
+            Indoor Dataset (OCID) with natural language annotations referencing objects in cluttered scenes. Each
+            environment presents
+            several distractor objects and ambiguous prompts. From this dataset, we sample 300 scenes, whose annotations
+            assume a viewer
+            positioned at the front of the table. We compare the performance of our Grounding Agent against the
+            highest-scoring detection
+            from GroundingDINO.
+          </p>
+
+          <img id="open_perception" src="static/images/groundingdino_performance.png"
+            style="max-width:50%; height:auto;">
+          <p>
+            Grounding Dino Performance with and without the VLM Agent for multi-granular search and disambiguation
+          </p>
+          <br>
+
+          <img id="open_perception" src="static/images/open_perception_ablation.png"
+            style="max-width:100%; height:auto;">
+
+          <p>
+            Our results demonstrate that enhancing Open-Vocabulary detectors with our VLM reasoning scheme allows the
+            model to
+            achieve a detection accuracy 5.3% higher than the model by itself. This represents a relative improvement of
+            10.2% without
+            changing any parameters of the base model.
+          </p>
+        </div>
+      </div>
+
+      <!-- prompt -->
+      <div class="container has-text-justified has-text-centered">
+        <h1 class="title">Agent Prompts</h1>
+
+        <div class="expandable-section ">
+          <button class="expandable-button" style="background-color:#88bd75">Advisor Agent - Prompt</button>
+          <div class="expandable-content" style="background-color:#d9ead3">
+            <p>
+              You are a supervisor AI agent whose job is to guide a robot in the execution of a task. You will be
+              provided
+              with the name of a task that the robot is trying to learn (e.g. open door) and an image of the
+              environment.
+              With that, you must follow the following steps:
+              <br>1- determine the key steps to solve the tasks.
+              <br>2- come up with the names of features or objects in the environment required to solve the task.
+              <br>3- check if the objects are present in the scene and can be detected by the robot by providing the
+              image to
+              the perception agent and asking the perception agent (e.g. ’Can you find the door handle?’ wait for
+              feedback),
+              If the answer goes against of what you expected to repeat the steps 1 to 3.
+              <br>4- Only proceed to this step after receiving positive feedback on 3. Write a Python code to guide the
+              robot
+              in the execution of the task. The output code needs to have a function that takes the robot’s state as
+              input
+              (def guidance(state, previous vars=’condition1’:False, ...):), queries the position of different elements
+              in the
+              environment (e.g get position(’door’)) and outputs a continuous score for how close is the robot to
+              completing
+              the task (e.g. the robot is far away from the door the score should be low).
+              <br>
+              <br>When writing the guidance function, you can make use of the following functions that are al-
+              ready implemented: get position(object name) ->[x,y,z], get size(object name) ->[height, width, depth],
+              get orientation(object name) ->euler angles rotation [rx,ry,rz]. and any other function that you think is
+              necessary to guide the robot (e.g. numpy, scipy, etc).
+              <br>The guidance function must return a score (float) and a vars dict (dict). The vars dict will be used
+              to store
+              the status of conditions relevant to the task completion. The previous vars dict input with contain the
+              vars dict
+              from the previous iteration. The score must be a continuous value having different values for different
+              states
+              of the robot. States slightly closer to the goal should have slightly higher scores. The next action of
+              the robot
+              will depend on the score returned by the guidance function when queried for many possible future states.
+              <br>The state of the robot is a list with 7 elements of the end-effector position, orientation and gripper
+              state
+              [x, y, z, rotation x, rotation y, rotation z, gripper], gripper represents the distance between the two
+              gripper
+              fingers. All distance values are expressed in meters. and the rotation values are expressed in degrees.”
+              start your code with the following import: ’from motor cortex.common.perception functions import
+              get position, get size, get orientation’. Do not include any example of the guidance function in the code,
+              only the function itself.
+              <br>
+              <br>code format example:
+            <pre><code>
+            '''
+            from motor cortex.common.perception functions import get position, get size, get orientation
+            # relevant imports
+            # helper functions
+            def guidance(state, previous_vars={'condition1': False, ...}):
+              # your code here
+              return score, vars_dict
+            '''
+            </code></pre>
+            You are encouraged to break down the task into sub-tasks, and implement helper functions to better organize
+            the code.
+            You can communicate with a perception agent and a robotic agent.
+            Always indicate who you are talking with by adding ’NEXT: perception agent’ or ’NEXT: robotic agent’ at
+            the end of your message.
+            </p>
+          </div>
+
+          <button class="expandable-button" style="background-color:#ffe085">Grounding Agent - Prompt</button>
+          <div class="expandable-content" style="background-color:#fff2cc">
+            <p>
+              You are a perception AI agent whose job is to identify and track objects in an image. You will be provided
+              with an image of the environment and a list of objects that the robot is trying to find (e.g. door,
+              handle,
+              key, etc). With that, you can make use of the following function to try to locate the objects in the
+              image:
+              in the image(image path, object name, parent name) ->yes/no. If the object is not found it might be
+              because
+              the object was too small, too far, or partially occluded, in this case, try to find a broader category
+              that
+              could encompass the object. In this case, report the function call used followed by ’NEXT: perception
+              agent’ to look for the objects using similar object names or with a parent name that cloud encompasses
+              the object. (e.g. first answer: ’in the image(’door handle’) ->no NEXT: perception agent’, second answer:
+              ’in the image(’door handle’, ’door’) ->no NEXT: perception agent’, third answer: ’in the image(’handle’,
+              ’gate’) ->yes. couldn’t find a door handle but found a gate handle NEXT: supervisor agent’). Report back
+              to the supervisor agent in a clear and concise way if the objects were found or not. If an object was
+              found
+              using a parent name, report the parent name and the object name. Use ’NEXT: supervisor agent’ at the end
+              of your message to indicate that you are talking with the supervisor agent, or ’NEXT: perception agent’ to
+              look further for the objects.
+            </p>
+          </div>
+
+          <button class="expandable-button" style="background-color:#7badf4">Robotic Agent - Prompt</button>
+          <div class="expandable-content" style="background-color:#dae8fc">
+            <p>
+              You are an AI agent responsible for controlling the learning process of a robot. You will receive Python
+              code
+              containing a guidance function that helps the robot with the execution of certain tasks. Your job is to
+              analyze
+              the environment and criticize the code provided by checking if the guidance code is correct and makes
+              sense.
+              <br>You SHOULD NOT create any code, only analyze the code provided by the supervisor. Attend to the
+              following:
+              <br>- The score provided by the guidance function is continuous and makes sense.
+              <br>- The task is being solved correctly.
+              <br>- The code can be further improved.
+              <br>- The states of the robot are being correctly expressed.
+              <br>- The code correctly conveys the steps to solve the task in the correct order.
+              <br>BE CRITICAL!
+              <br>Make sure that the robot state is expressed as its end-effector position and orientation in the format
+              by using the
+              function test guidance code format(). If the code is not correct or can be further improved, provide
+              feedback
+              to the supervisor agent and ask for a new code. Use ’NEXT: supervisor agent’ at the end of your message
+              to indicate that you are talking with the supervisor agent. If no code is provided, ask the supervisor
+              agent
+              to generate the guidance code. If the code received makes sense and is correct, simply output the word
+              ’TERMINATE’.
+            </p>
+          </div>
+
+
+          <button class="expandable-button" style="background-color:#b7b7b7">Monitor Agent - Prompt</button>
+          <div class="expandable-content" style="background-color:#f3f3f3">
+            <p>
+              You will be given a sequence of frames of a robotic manipulator performing a task, and a guidance code
+              used
+              by the robot to perform the task.
+              <br>Your job is to describe what the sequence of frames captures, and then list how the robot could better
+              perform
+              the task in a simple and concise way.
+              <br>Do not provide any code, just describe the task and how it could be improved.
+            </p>
+          </div>
+        </div>
+        <div class="columns is-centered"></div>
+        <div class="column">
+          <h2 class="title is-4">Agentic Framework Diagram</h2>
+          <img src="static/images/AgenticNetwork-Agentic-Framework-V1.png" alt="Agentic Framework Diagram"
+            style="max-width:100%; height:auto;">
+          <p>
+            The agents in the GRAPPA framework are instances of large multimodal models that communicate with each other
+            to
+            produce a final guidance code; leveraging the reasoning capabilities of this type of model. This image
+            exemplifies the chain of
+            thought each agent is encouraged to follow, which in practice is encoded as a natural language prompt shown
+            in the Appendix.
+            The agents can call external tools to aid their analysis such as detection models and a Python interpreter
+            for scrutinizing the
+            code. The advisor agent acts as the main orchestrator, querying the other agents as necessary and generating
+            and refining the
+            guidance code with the provided feedback.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    </div>
+  </section>
+
+
+  <!-- 
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">Animation</h2>
+
+        <h3 class="title is-4">Interpolating states</h3>
+        <div class="content has-text-justified">
+          <p>
+            We can also animate the scene by interpolating the deformation latent codes of two input
+            frames. Use the slider here to linearly interpolate between the left frame and the right
+            frame.
+          </p>
+        </div>
+        <div class="columns is-vcentered interpolation-panel">
+          <div class="column is-3 has-text-centered">
+            <img src="./static/images/interpolate_start.jpg"
+                 class="interpolation-image"
+                 alt="Interpolate start reference image."/>
+            <p>Start Frame</p>
+          </div>
+          <div class="column interpolation-video-column">
+            <div id="interpolation-image-wrapper">
+              Loading...
+            </div>
+            <input class="slider is-fullwidth is-large is-info"
+                   id="interpolation-slider"
+                   step="1" min="0" max="100" value="0" type="range">
+          </div>
+          <div class="column is-3 has-text-centered">
+            <img src="./static/images/interpolate_end.jpg"
+                 class="interpolation-image"
+                 alt="Interpolation end reference image."/>
+            <p class="is-bold">End Frame</p>
+          </div>
+        </div>
+        <br/>
+
+        <h3 class="title is-4">Re-rendering the input video</h3>
+        <div class="content has-text-justified">
+          <p>
+            Using <span class="grappa">Nerfies</span>, you can re-render a video from a novel
+            viewpoint such as a stabilized camera by playing back the training deformations.
+          </p>
+        </div>
+        <div class="content has-text-centered">
+          <video id="replay-video"
+                 controls
+                 muted
+                 preload
+                 playsinline
+                 width="75%">
+            <source src="./static/videos/replay.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+
+      </div>
+    </div>
+
+
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">Related Links</h2>
+
+        <div class="content has-text-justified">
+          <p>
+            There's a lot of excellent work that was introduced around the same time as ours.
+          </p>
+          <p>
+            <a href="https://arxiv.org/abs/2104.09125">Progressive Encoding for Neural Optimization</a> introduces an idea similar to our windowed position encoding for coarse-to-fine optimization.
+          </p>
+          <p>
+            <a href="https://www.albertpumarola.com/research/D-NeRF/index.html">D-NeRF</a> and <a href="https://gvv.mpi-inf.mpg.de/projects/nonrigid_nerf/">NR-NeRF</a>
+            both use deformation fields to model non-rigid scenes.
+          </p>
+          <p>
+            Some works model videos with a NeRF by directly modulating the density, such as <a href="https://video-nerf.github.io/">Video-NeRF</a>, <a href="https://www.cs.cornell.edu/~zl548/NSFF/">NSFF</a>, and <a href="https://neural-3d-video.github.io/">DyNeRF</a>
+          </p>
+          <p>
+            There are probably many more by the time you are reading this. Check out <a href="https://dellaert.github.io/NeRF/">Frank Dellart's survey on recent NeRF papers</a>, and <a href="https://github.com/yenchenlin/awesome-NeRF">Yen-Chen Lin's curated list of NeRF papers</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section> -->
+
+
+
+  <footer class="footer">
+    <div class="container">
+      <div class="content has-text-centered">
+        <a class="icon-link" href="./static/documents/GRAPPA_RAL.pdf">
+          <i class="fas fa-file-pdf"></i>
+        </a>
+        <a class="icon-link" href="" class="external-link" disabled>
+          <i class="fab fa-github"></i>
+        </a>
+      </div>
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="content">
+            <p>
+              This website is licensed under a <a rel="license"
+                href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+                Commons Attribution-ShareAlike 4.0 International License</a>.
+            </p>
+            <p>
+              This means you are free to borrow the <a href="https://github.com/nerfies/nerfies.github.io">source
+                code</a> of this website,
+              we just ask that you link back to this page in the footer.
+              Please remember to remove the analytics code included in the header of the website which
+              you do not want on your website.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+
+</html>
